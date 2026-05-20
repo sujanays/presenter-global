@@ -1,0 +1,23 @@
+{
+  "name": "desktop-agent",
+  "version": "1.0.0",
+  "description": "Presenter Desktop Agent Controller",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && electron dist/main/index.js",
+    "start": "electron dist/main/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "qr-image": "^3.2.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "optionalDependencies": {
+    "robotjs": "^0.6.0"
+  },
+  "devDependencies": {
+    "electron": "^28.2.2",
+    "typescript": "^5.3.3"
+  }
+}

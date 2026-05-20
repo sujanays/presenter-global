@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presenter Desktop Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0c10;
+      --bg-card: #1f2833;
+      --text-main: #c5c6c7;
+      --text-bright: #ffffff;
+      --color-primary: #66fcf1;
+      --color-secondary: #45f3ff;
+      --color-accent: #f75a68;
+      --color-green: #00b37e;
+      --font-family: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      background: rgba(31, 40, 51, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 36px 28px;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 80px rgba(102, 252, 241, 0.03);
+      position: relative;
+    }
+
+    .glow-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(102, 252, 241, 0.08) 0%, rgba(102, 252, 241, 0) 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: #000;
+      font-weight: 700;
+      font-size: 24px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(102, 252, 241, 0.3);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-bright);
+      letter-spacing: 0.5px;
+    }
+
+    p.subtitle {
+      font-size: 13px;
+      color: #8d8d99;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+      color: var(--color-accent);
+      transition: all 0.3s ease;
+    }
+
+    .status-badge.connected {
+      color: var(--color-green);
+      background: rgba(0, 179, 126, 0.08);
+      border-color: rgba(0, 179, 126, 0.15);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .status-badge.connected .status-dot {
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 179, 126, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(0, 179, 126, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 179, 126, 0); }
+    }
+
+    .qr-card {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      margin-bottom: 24px;
+      width: 196px;
+      height: 196px;
+      position: relative;
+    }
+
+    .qr-image {
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+
+    .qr-placeholder {
+      font-size: 12px;
+      color: #121214;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .pairing-details {
+      text-align: center;
+      width: 100%;
+    }
+
+    .pairing-code-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8d8d99;
+      margin-bottom: 4px;
+    }
+
+    .pairing-code {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+
+    .device-id {
+      font-size: 11px;
+      color: #555866;
+      background: rgba(0,0,0,0.2);
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+      font-family: monospace;
+    }
+
+    .instructions {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #8d8d99;
+      line-height: 1.5;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 16px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-ring"></div>
+  <div class="container">
+    <div class="header">
+      <div class="logo">P</div>
+      <h1>Presenter Remote</h1>
+      <p class="subtitle">Cloud-connected presentation engine</p>
+    </div>
+
+    <div id="status-badge" class="status-badge">
+      <div class="status-dot"></div>
+      <span id="status-text">CONNECTING</span>
+    </div>
+
+    <div class="qr-card">
+      <div id="qr-loading" class="qr-placeholder">Generating QR code...</div>
+      <img id="qr-img" class="qr-image" alt="Pairing QR Code" />
+    </div>
+
+    <div class="pairing-details">
+      <div class="pairing-code-label">Verification Code</div>
+      <div id="pairing-code" class="pairing-code">------</div>
+      <div id="device-id" class="device-id">Device: ID-LOADING</div>
+    </div>
+
+    <div class="instructions">
+      Scan this QR code with your mobile browser to instantly pair and start controlling your presentations.
+    </div>
+  </div>
+
+  <script>
+    // Listen to IPC events from Electron Main Process
+    window.electronAPI.onUpdateConnectionStatus((event, status) => {
+      const badge = document.getElementById('status-badge');
+      const text = document.getElementById('status-text');
+
+      text.innerText = status.toUpperCase();
+
+      if (status === 'Connected') {
+        badge.classList.add('connected');
+      } else {
+        badge.classList.remove('connected');
+      }
+    });
+
+    window.electronAPI.onUpdatePairingDetails((event, data) => {
+      // Set QR Code Image
+      const qrImg = document.getElementById('qr-img');
+      const qrLoading = document.getElementById('qr-loading');
+      
+      qrImg.src = 'data:image/png;base64,' + data.qrBase64;
+      qrImg.style.display = 'block';
+      qrLoading.style.display = 'none';
+
+      // Set pairing code details
+      document.getElementById('pairing-code').innerText = data.temporaryPairToken;
+      document.getElementById('device-id').innerText = 'ID: ' + data.deviceId;
+    });
+
+    // Proactively request pairing details from the main process on load
+    if (window.electronAPI && window.electronAPI.requestPairingInfo) {
+      window.electronAPI.requestPairingInfo();
+    }
+  </script>
+</body>
+</html>

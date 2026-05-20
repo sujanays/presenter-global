@@ -1,0 +1,22 @@
+{
+  "name": "presenter-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Globally accessible presentation remote platform monorepo",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "backend:dev": "npm --prefix apps/backend run dev",
+    "backend:build": "npm --prefix apps/backend run build",
+    "backend:start": "npm --prefix apps/backend start",
+    "desktop:dev": "npm --prefix apps/desktop-agent run dev",
+    "desktop:build": "npm --prefix apps/desktop-agent run build",
+    "mobile:dev": "npm --prefix apps/mobile-web run dev",
+    "mobile:build": "npm --prefix apps/mobile-web run build",
+    "mobile:start": "npm --prefix apps/mobile-web start"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
