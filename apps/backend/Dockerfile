@@ -8,7 +8,7 @@ COPY package*.json ./
 COPY tsconfig*.json ./
 
 # Install build dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source
 COPY src/ ./src/
@@ -22,7 +22,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Copy compiled files from builder
 COPY --from=builder /app/dist ./dist

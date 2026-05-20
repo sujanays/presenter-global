@@ -9,7 +9,7 @@ COPY tailwind.config.js ./
 COPY postcss.config.js ./
 COPY next.config.js ./
 
-RUN npm ci
+RUN npm install
 
 COPY src/ ./src/
 
