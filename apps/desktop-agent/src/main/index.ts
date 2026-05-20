@@ -8,6 +8,7 @@ import { createLaserOverlay, updateLaserPosition } from './overlay.js';
 
 // Constants
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+const MOBILE_URL = process.env.MOBILE_URL || 'http://localhost:3000';
 const APP_NAME = 'Presenter Desktop Agent';
 
 let mainWindow: BrowserWindow | null = null;
@@ -249,7 +250,7 @@ const generateAndSendPairingQR = async () => {
   }
 
   // Pairing URL that mobile devices scan
-  const pairingUrl = `${BACKEND_URL}/pair?token=${temporaryPairToken}&deviceId=${deviceId}`;
+  const pairingUrl = `${MOBILE_URL}/?token=${temporaryPairToken}&deviceId=${deviceId}`;
 
   try {
     const qrPngBuffer = qr.imageSync(pairingUrl, { type: 'png', margin: 1 });
