@@ -12,6 +12,7 @@ COPY next.config.js ./
 RUN npm install
 
 COPY src/ ./src/
+COPY public/ ./public/
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
