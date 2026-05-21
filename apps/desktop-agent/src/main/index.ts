@@ -1,3 +1,5 @@
+import { existsSync } from 'fs';
+import { createRequire } from 'module';
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { io, Socket } from 'socket.io-client';
@@ -6,9 +8,24 @@ import { inputInjector } from './injector.js';
 import { createSystemTray, updateTrayStatus } from './tray.js';
 import { createLaserOverlay, updateLaserPosition } from './overlay.js';
 
-// Constants
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
-const MOBILE_URL = process.env.MOBILE_URL || 'http://localhost:3000';
+const nodeRequire = createRequire(__filename);
+(function loadMonorepoEnv() {
+  let dir = __dirname;
+  for (let i = 0; i < 10; i++) {
+    const loaderPath = path.join(dir, 'config/loadRootEnv.cjs');
+    if (existsSync(loaderPath)) {
+      nodeRequire(loaderPath).loadRootEnv(__dirname);
+      return;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  console.warn('[env] config/loadRootEnv.cjs not found');
+})();
+
+const BACKEND_URL = (process.env.BACKEND_URL || 'http://localhost:3001').replace(/\/$/, '');
+const MOBILE_URL = (process.env.MOBILE_URL || process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
 const APP_NAME = 'Presenter Desktop Agent';
 
 let mainWindow: BrowserWindow | null = null;
@@ -143,8 +160,10 @@ const createMainWindow = () => {
 };
 
 const setupRealtimeSocket = () => {
-  console.log(`Connecting to backend at: ${BACKEND_URL}`);
+  console.log(`Connecting to backend at: ${BACKEND_URL} (mobile QR base: ${MOBILE_URL})`);
   socket = io(BACKEND_URL, {
+    transports: ['websocket', 'polling'],
+    secure: BACKEND_URL.startsWith('https://'),
     reconnection: true,
     reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,
@@ -229,7 +248,6 @@ const setupRealtimeSocket = () => {
 const generateAndSendPairingQR = async () => {
   let temporaryPairToken = '';
   try {
-    // Request a secure temporary token from the backend
     const response = await fetch(`${BACKEND_URL}/api/v1/devices/pair/request`, {
       method: 'POST',
       headers: {
@@ -238,15 +256,24 @@ const generateAndSendPairingQR = async () => {
       body: JSON.stringify({ deviceId }),
     });
 
-    if (response.ok) {
-      const resData = await response.json() as { temporaryPairToken: string };
-      temporaryPairToken = resData.temporaryPairToken;
-    } else {
+    if (!response.ok) {
       throw new Error(`HTTP error ${response.status}`);
     }
+
+    const resData = await response.json() as { temporaryPairToken: string };
+    temporaryPairToken = resData.temporaryPairToken;
   } catch (err) {
-    console.warn('Failed to fetch pairing token from backend. Generating offline token fallback:', err);
-    temporaryPairToken = Math.floor(100000 + Math.random() * 900000).toString();
+    console.error('Failed to fetch pairing token from backend:', err);
+    updateStatusInRenderer('Pairing Error');
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('UPDATE_PAIRING', {
+        deviceId,
+        qrBase64: '',
+        temporaryPairToken: '------',
+        error: 'Cannot reach backend. Check BACKEND_URL and network.',
+      });
+    }
+    return;
   }
 
   // Pairing URL that mobile devices scan

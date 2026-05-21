@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import { env } from './config/env.js';
+import { corsOrigins, env, envDiagnostics } from './config/env.js';
 import { registerSocketHandlers } from './sockets/socketHandler.js';
 import { getDbPool, query } from './config/db.js';
 import { getRedisClient, getRedisPubSub } from './config/redis.js';
@@ -15,7 +15,7 @@ const httpServer = createServer(app);
 
 // CORS config
 app.use(cors({
-  origin: [env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: corsOrigins,
   credentials: true,
 }));
 
@@ -31,22 +31,33 @@ app.get('/health', async (req, res) => {
   let dbStatus = 'disconnected';
   let redisStatus = 'disconnected';
 
+  let dbError: string | undefined;
   try {
     const dbTest = await query('SELECT NOW()');
     if (dbTest && dbTest.rows.length > 0) {
       dbStatus = 'connected';
     }
-  } catch (e) {
+  } catch (e: any) {
     dbStatus = 'error (using fallback/offline mode)';
+    dbError = e?.message || 'unknown database error';
   }
 
+  let redisError: string | undefined;
   try {
     const redis = getRedisClient();
-    if (redis && redis.status === 'ready') {
+    if (!redis) {
+      redisStatus = 'not configured';
+      redisError = 'REDIS_URL missing or points to localhost';
+    } else if (!envDiagnostics.redisUrlConfigured) {
+      redisStatus = 'not configured';
+      redisError = 'Set REDIS_URL on Render to your Redis/Key Value internal URL';
+    } else {
+      await redis.ping();
       redisStatus = 'connected';
     }
-  } catch (e) {
-    redisStatus = 'offline';
+  } catch (e: any) {
+    redisStatus = 'disconnected';
+    redisError = e?.message || 'redis ping failed';
   }
 
   res.json({
@@ -54,6 +65,9 @@ app.get('/health', async (req, res) => {
     uptime: process.uptime(),
     db: dbStatus,
     redis: redisStatus,
+    config: envDiagnostics,
+    ...(dbError ? { dbError } : {}),
+    ...(redisError ? { redisError } : {}),
     timestamp: new Date().toISOString(),
   });
 });

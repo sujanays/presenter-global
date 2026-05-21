@@ -1,0 +1,507 @@
+
+> backend@1.0.0 dev
+> tsx watch src/server.ts
+
+[env] Loaded C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\.env
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Executed query {
+  text: '\n' +
+    '    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS users (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        email VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        password_hash VARCHAR(255) NOT NULL,\n' +
+    '        first_name VARCHAR(100),\n' +
+    '        last_name VARCHAR(100),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS devices (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE CASCADE,\n' +
+    '        device_uid VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        device_name VARCHAR(100) NOT NULL,\n' +
+    "        device_type VARCHAR(50) NOT NULL, -- 'desktop', 'mobile'\n" +
+    '        os_name VARCHAR(50),\n' +
+    '        os_version VARCHAR(50),\n' +
+    '        push_token VARCHAR(255),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS trusted_pairs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        mobile_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    "        pair_name VARCHAR(100) DEFAULT 'Trusted Mobile Remote',\n" +
+    '        auth_secret VARCHAR(255) NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        CONSTRAINT unique_desktop_mobile_pair UNIQUE(desktop_device_id, mobile_device_id)\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS sessions (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        session_token VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        ended_at TIMESTAMP WITH TIME ZONE\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS websocket_connections (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        socket_id VARCHAR(100) UNIQUE NOT NULL,\n' +
+    '        device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        server_node_id VARCHAR(100) NOT NULL,\n' +
+    '        connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_ping_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS audit_logs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n' +
+    '        event_type VARCHAR(100) NOT NULL,\n' +
+    '        ip_address VARCHAR(45),\n' +
+    '        user_agent VARCHAR(255),\n' +
+    '        payload JSONB,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '  ',
+  duration: 70,
+  rows: undefined
+}
+PostgreSQL database schemas verified & created successfully.
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at startServer (C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\apps\backend\src\server.ts:186:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v24.13.1
+11:44:54 am [tsx] change in ./src\config\redis.ts Rerunning...
+c[env] Loaded C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\.env
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Executed query {
+  text: '\n' +
+    '    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS users (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        email VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        password_hash VARCHAR(255) NOT NULL,\n' +
+    '        first_name VARCHAR(100),\n' +
+    '        last_name VARCHAR(100),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS devices (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE CASCADE,\n' +
+    '        device_uid VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        device_name VARCHAR(100) NOT NULL,\n' +
+    "        device_type VARCHAR(50) NOT NULL, -- 'desktop', 'mobile'\n" +
+    '        os_name VARCHAR(50),\n' +
+    '        os_version VARCHAR(50),\n' +
+    '        push_token VARCHAR(255),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS trusted_pairs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        mobile_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    "        pair_name VARCHAR(100) DEFAULT 'Trusted Mobile Remote',\n" +
+    '        auth_secret VARCHAR(255) NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        CONSTRAINT unique_desktop_mobile_pair UNIQUE(desktop_device_id, mobile_device_id)\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS sessions (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        session_token VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        ended_at TIMESTAMP WITH TIME ZONE\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS websocket_connections (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        socket_id VARCHAR(100) UNIQUE NOT NULL,\n' +
+    '        device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        server_node_id VARCHAR(100) NOT NULL,\n' +
+    '        connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_ping_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS audit_logs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n' +
+    '        event_type VARCHAR(100) NOT NULL,\n' +
+    '        ip_address VARCHAR(45),\n' +
+    '        user_agent VARCHAR(255),\n' +
+    '        payload JSONB,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '  ',
+  duration: 147,
+  rows: undefined
+}
+PostgreSQL database schemas verified & created successfully.
+====================================================
+Presenter Server running on port 3001 in development mode.
+WebSocket Server active.
+====================================================
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+11:44:56 am [tsx] change in ./src\config\redis.ts Restarting...
+c11:44:57 am [tsx] change in ./src\server.ts Restarting...
+c[env] Loaded C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\.env
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Executed query {
+  text: '\n' +
+    '    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS users (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        email VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        password_hash VARCHAR(255) NOT NULL,\n' +
+    '        first_name VARCHAR(100),\n' +
+    '        last_name VARCHAR(100),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS devices (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE CASCADE,\n' +
+    '        device_uid VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        device_name VARCHAR(100) NOT NULL,\n' +
+    "        device_type VARCHAR(50) NOT NULL, -- 'desktop', 'mobile'\n" +
+    '        os_name VARCHAR(50),\n' +
+    '        os_version VARCHAR(50),\n' +
+    '        push_token VARCHAR(255),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS trusted_pairs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        mobile_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    "        pair_name VARCHAR(100) DEFAULT 'Trusted Mobile Remote',\n" +
+    '        auth_secret VARCHAR(255) NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        CONSTRAINT unique_desktop_mobile_pair UNIQUE(desktop_device_id, mobile_device_id)\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS sessions (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        session_token VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        ended_at TIMESTAMP WITH TIME ZONE\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS websocket_connections (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        socket_id VARCHAR(100) UNIQUE NOT NULL,\n' +
+    '        device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        server_node_id VARCHAR(100) NOT NULL,\n' +
+    '        connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_ping_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS audit_logs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n' +
+    '        event_type VARCHAR(100) NOT NULL,\n' +
+    '        ip_address VARCHAR(45),\n' +
+    '        user_agent VARCHAR(255),\n' +
+    '        payload JSONB,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '  ',
+  duration: 125,
+  rows: undefined
+}
+PostgreSQL database schemas verified & created successfully.
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at startServer (C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\apps\backend\src\server.ts:186:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v24.13.1
+11:45:03 am [tsx] change in ./src\server.ts Rerunning...
+c[env] Loaded C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\.env
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Executed query {
+  text: '\n' +
+    '    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS users (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        email VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        password_hash VARCHAR(255) NOT NULL,\n' +
+    '        first_name VARCHAR(100),\n' +
+    '        last_name VARCHAR(100),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS devices (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE CASCADE,\n' +
+    '        device_uid VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        device_name VARCHAR(100) NOT NULL,\n' +
+    "        device_type VARCHAR(50) NOT NULL, -- 'desktop', 'mobile'\n" +
+    '        os_name VARCHAR(50),\n' +
+    '        os_version VARCHAR(50),\n' +
+    '        push_token VARCHAR(255),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS trusted_pairs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        mobile_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    "        pair_name VARCHAR(100) DEFAULT 'Trusted Mobile Remote',\n" +
+    '        auth_secret VARCHAR(255) NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        CONSTRAINT unique_desktop_mobile_pair UNIQUE(desktop_device_id, mobile_device_id)\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS sessions (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        session_token VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        ended_at TIMESTAMP WITH TIME ZONE\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS websocket_connections (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        socket_id VARCHAR(100) UNIQUE NOT NULL,\n' +
+    '        device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        server_node_id VARCHAR(100) NOT NULL,\n' +
+    '        connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_ping_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS audit_logs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n' +
+    '        event_type VARCHAR(100) NOT NULL,\n' +
+    '        ip_address VARCHAR(45),\n' +
+    '        user_agent VARCHAR(255),\n' +
+    '        payload JSONB,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '  ',
+  duration: 116,
+  rows: undefined
+}
+PostgreSQL database schemas verified & created successfully.
+====================================================
+Presenter Server running on port 3001 in development mode.
+WebSocket Server active.
+====================================================
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
++
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        session_token VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        ended_at TIMESTAMP WITH TIME ZONE\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS websocket_connections (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        socket_id VARCHAR(100) UNIQUE NOT NULL,\n' +
+    '        device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        server_node_id VARCHAR(100) NOT NULL,\n' +
+    '        connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_ping_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS audit_logs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n' +
+    '        event_type VARCHAR(100) NOT NULL,\n' +
+    '        ip_address VARCHAR(45),\n' +
+    '        user_agent VARCHAR(255),\n' +
+    '        payload JSONB,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '  ',
+  duration: 119,
+  rows: undefined
+}
+PostgreSQL database schemas verified & created successfully.
+====================================================
+Presenter Server running on port 3001 in development mode.
+WebSocket Server active.
+====================================================
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+11:45:03 am [tsx] change in ./src\server.ts Restarting...
+c[env] Loaded C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\.env
+Redis scaling adapter pub client offline. Keeping local memory adapter.
+Redis scaling adapter sub client offline. Keeping local memory adapter.
+Executed query {
+  text: '\n' +
+    '    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS users (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        email VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        password_hash VARCHAR(255) NOT NULL,\n' +
+    '        first_name VARCHAR(100),\n' +
+    '        last_name VARCHAR(100),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS devices (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE CASCADE,\n' +
+    '        device_uid VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        device_name VARCHAR(100) NOT NULL,\n' +
+    "        device_type VARCHAR(50) NOT NULL, -- 'desktop', 'mobile'\n" +
+    '        os_name VARCHAR(50),\n' +
+    '        os_version VARCHAR(50),\n' +
+    '        push_token VARCHAR(255),\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS trusted_pairs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        mobile_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    "        pair_name VARCHAR(100) DEFAULT 'Trusted Mobile Remote',\n" +
+    '        auth_secret VARCHAR(255) NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        CONSTRAINT unique_desktop_mobile_pair UNIQUE(desktop_device_id, mobile_device_id)\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS sessions (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        desktop_device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        session_token VARCHAR(255) UNIQUE NOT NULL,\n' +
+    '        is_active BOOLEAN DEFAULT TRUE,\n' +
+    '        started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        ended_at TIMESTAMP WITH TIME ZONE\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS websocket_connections (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        socket_id VARCHAR(100) UNIQUE NOT NULL,\n' +
+    '        device_id UUID REFERENCES devices(id) ON DELETE CASCADE,\n' +
+    '        server_node_id VARCHAR(100) NOT NULL,\n' +
+    '        connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n' +
+    '        last_ping_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '\n' +
+    '    CREATE TABLE IF NOT EXISTS audit_logs (\n' +
+    '        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n' +
+    '        user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n' +
+    '        event_type VARCHAR(100) NOT NULL,\n' +
+    '        ip_address VARCHAR(45),\n' +
+    '        user_agent VARCHAR(255),\n' +
+    '        payload JSONB,\n' +
+    '        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n' +
+    '    );\n' +
+    '  ',
+  duration: 112,
+  rows: undefined
+}
+PostgreSQL database schemas verified & created successfully.
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at startServer (C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\apps\backend\src\server.ts:200:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v24.13.1

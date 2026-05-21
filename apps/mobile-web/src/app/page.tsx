@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { KeyRound, Smartphone, Monitor, ChevronRight, Play, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import ConnectionStatus from '../components/ConnectionStatus';
@@ -8,6 +8,8 @@ import SlideControls from '../components/SlideControls';
 import LaserPointer from '../components/LaserPointer';
 import Trackpad from '../components/Trackpad';
 import Settings from '../components/Settings';
+import { getBackendUrl } from '../lib/backendUrl';
+import { getSocketOptions } from '../lib/socketOptions';
 
 export default function MobileRemoteApp() {
   // Navigation & session state
@@ -25,22 +27,8 @@ export default function MobileRemoteApp() {
 
   const socketRef = useRef<Socket | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // 1. Grab parameters from URL for automatic QR Code scan pairing
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlToken = params.get('token');
-      const urlDeviceId = params.get('deviceId');
-
-      if (urlToken && urlDeviceId) {
-        setDeviceIdInput(urlDeviceId);
-        setPairTokenInput(urlToken);
-        // Trigger auto pair
-        handlePair(urlDeviceId, urlToken);
-      }
-    }
-  }, []);
+  const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
+  const autoPairStartedRef = useRef(false);
 
   // 2. Session timer ticks
   useEffect(() => {
@@ -58,23 +46,27 @@ export default function MobileRemoteApp() {
     };
   }, [status]);
 
-  // 3. Setup WebSocket connection
-  const connectSocket = (targetDeviceId: string, verifiedToken: string) => {
+  const clearHeartbeat = () => {
+    if (heartbeatRef.current) {
+      clearInterval(heartbeatRef.current);
+      heartbeatRef.current = null;
+    }
+  };
+
+  // Setup WebSocket connection after pairing is verified
+  const connectSocket = useCallback((targetDeviceId: string, verifiedToken: string) => {
     if (socketRef.current) {
       socketRef.current.disconnect();
+      socketRef.current = null;
     }
+    clearHeartbeat();
 
     setStatus('connecting');
-    
-    // Determine backend host location (defaults to local backend port)
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
-    console.log('Connecting remote client to socket at:', backendUrl);
-    
-    const socket = io(backendUrl, {
-      reconnection: true,
-      reconnectionDelay: 1000,
-    });
 
+    const backendUrl = getBackendUrl();
+    console.log('Connecting remote client to socket at:', backendUrl);
+
+    const socket = io(backendUrl, getSocketOptions(backendUrl));
     socketRef.current = socket;
 
     socket.on('connect', () => {
@@ -82,15 +74,13 @@ export default function MobileRemoteApp() {
       setStatus('connected');
       setPaired(true);
 
-      // Join presentation room
       socket.emit('SESSION_JOIN', {
         deviceId: targetDeviceId,
         role: 'mobile',
         token: verifiedToken,
       });
-      
-      // Setup latency check ping interval
-      setInterval(() => {
+
+      heartbeatRef.current = setInterval(() => {
         if (socket.connected) {
           const start = Date.now();
           socket.emit('HEARTBEAT', { clientTime: start });
@@ -105,21 +95,33 @@ export default function MobileRemoteApp() {
     socket.on('disconnect', () => {
       console.warn('WebSocket channel disconnected.');
       setStatus('disconnected');
+      clearHeartbeat();
     });
 
     socket.on('connect_error', () => {
       setStatus('disconnected');
+      setPaired(false);
+      setPairError('Could not connect to presentation server. Check network and try again.');
+      clearHeartbeat();
     });
-  };
 
-  const handlePair = async (targetDevice: string, targetToken: string) => {
+    socket.on('error', (data: { message?: string }) => {
+      console.error('Socket authorization error:', data);
+      setStatus('disconnected');
+      setPaired(false);
+      setPairError(data?.message || 'Session authorization failed. Please pair again.');
+      clearHeartbeat();
+    });
+  }, []);
+
+  const handlePair = useCallback(async (targetDevice: string, targetToken: string) => {
     if (!targetDevice) return;
     setPairError(null);
     setStatus('connecting');
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
-      
+      const backendUrl = getBackendUrl();
+
       // Try to verify the pairing token with the backend
       const response = await fetch(`${backendUrl}/api/v1/devices/pair/verify`, {
         method: 'POST',
@@ -149,7 +151,30 @@ export default function MobileRemoteApp() {
       setStatus('disconnected');
       setPaired(false);
     }
-  };
+  }, [connectSocket]);
+
+  // Auto-pair when opened via QR deep link (?token=&deviceId=)
+  useEffect(() => {
+    if (typeof window === 'undefined' || autoPairStartedRef.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('token');
+    const urlDeviceId = params.get('deviceId');
+
+    if (urlToken && urlDeviceId) {
+      autoPairStartedRef.current = true;
+      setDeviceIdInput(urlDeviceId);
+      setPairTokenInput(urlToken);
+      handlePair(urlDeviceId, urlToken);
+    }
+  }, [handlePair]);
+
+  useEffect(() => {
+    return () => {
+      clearHeartbeat();
+      socketRef.current?.disconnect();
+    };
+  }, []);
 
   const handleManualPairSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +183,7 @@ export default function MobileRemoteApp() {
   };
 
   const handleDisconnect = () => {
+    clearHeartbeat();
     if (socketRef.current) {
       socketRef.current.disconnect();
       socketRef.current = null;

@@ -258,15 +258,19 @@
     });
 
     window.electronAPI.onUpdatePairingDetails((event, data) => {
-      // Set QR Code Image
       const qrImg = document.getElementById('qr-img');
       const qrLoading = document.getElementById('qr-loading');
-      
-      qrImg.src = 'data:image/png;base64,' + data.qrBase64;
-      qrImg.style.display = 'block';
-      qrLoading.style.display = 'none';
 
-      // Set pairing code details
+      if (data.error || !data.qrBase64) {
+        qrLoading.innerText = data.error || 'Pairing unavailable';
+        qrLoading.style.display = 'block';
+        qrImg.style.display = 'none';
+      } else {
+        qrImg.src = 'data:image/png;base64,' + data.qrBase64;
+        qrImg.style.display = 'block';
+        qrLoading.style.display = 'none';
+      }
+
       document.getElementById('pairing-code').innerText = data.temporaryPairToken;
       document.getElementById('device-id').innerText = 'ID: ' + data.deviceId;
     });

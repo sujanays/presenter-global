@@ -3,11 +3,16 @@ import { env } from './env.js';
 
 let pool: Pool | null = null;
 
+const databaseNeedsSsl = (): boolean => {
+  if (env.NODE_ENV === 'production') return true;
+  return /render\.com|neon\.tech|supabase\.co|sslmode=require/i.test(env.DATABASE_URL);
+};
+
 export const getDbPool = (): Pool => {
   if (!pool) {
     pool = new Pool({
       connectionString: env.DATABASE_URL,
-      ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+      ssl: databaseNeedsSsl() ? { rejectUnauthorized: false } : undefined,
     });
 
     pool.on('error', (err) => {

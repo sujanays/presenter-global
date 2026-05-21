@@ -1,0 +1,42 @@
+
+> desktop-agent@1.0.0 dev
+> tsc && electron dist/main/index.js
+
+
+RobotJS native module failed to load. Using Windows PowerShell fallback injector. Error: Cannot find module './build/Release/robotjs.node'
+Require stack:
+- C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\node_modules\robotjs\index.js
+- C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\apps\desktop-agent\dist\main\injector.js
+- C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\apps\desktop-agent\dist\main\index.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1084:15)
+    at s._resolveFilename (node:electron/js2c/browser_init:2:114421)
+    at Module._load (node:internal/modules/cjs/loader:929:27)
+    at c._load (node:electron/js2c/node_init:2:13672)
+    at Module.require (node:internal/modules/cjs/loader:1150:19)
+    at require (node:internal/modules/cjs/helpers:119:18)
+    at Object.<anonymous> (C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\node_modules\robotjs\index.js:1:15)
+    at Module._compile (node:internal/modules/cjs/loader:1271:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1326:10)
+    at Module.load (node:internal/modules/cjs/loader:1126:32) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\1_WORKSPACE\\01_ENGG\\Projects Antigravity\\Presenter\\node_modules\\robotjs\\index.js',
+    'C:\\1_WORKSPACE\\01_ENGG\\Projects Antigravity\\Presenter\\apps\\desktop-agent\\dist\\main\\injector.js',
+    'C:\\1_WORKSPACE\\01_ENGG\\Projects Antigravity\\Presenter\\apps\\desktop-agent\\dist\\main\\index.js'
+  ]
+}
+[env] Loaded C:\1_WORKSPACE\01_ENGG\Projects Antigravity\Presenter\.env
+Connecting to backend at: https://presenter-global.onrender.com (mobile QR base: https://presenter-mobile.onrender.com)
+[23232:0521/112413.456:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[23232:0521/112413.456:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[23232:0521/112413.473:ERROR:disk_cache.cc(208)] Unable to create cache
+[23232:0521/112413.473:ERROR:gpu_disk_cache.cc(676)] Gpu Cache Creation failed: -2
+[23232:0521/112413.473:ERROR:disk_cache.cc(208)] Unable to create cache
+[23232:0521/112413.473:ERROR:gpu_disk_cache.cc(676)] Gpu Cache Creation failed: -2
+Successfully connected to cloud backend.
+Disconnected from backend.
+Successfully connected to cloud backend.
+Disconnected from backend.
+Successfully connected to cloud backend.
+Disconnected from backend.
+Successfully connected to cloud backend.
